@@ -12,19 +12,26 @@ def cadastrar_livro():
 # Função para listar os livros cadastrados
 def listar_livros():
     if not livros:
-        print('Nenhum livro cadastrado.')
+        print('Nenhum livro cadastrado. \f')
     else:
-        print('Lista de livros:')
+        print('Lista de livros: \f')
         for i, livro in enumerate(livros):
-            print(f'{i + 1}. {livro['titulo']} por {livro['autor']}')
+            print(f'{i + 1}. {livro['titulo']} por {livro['autor']} \f')
+
+# Função para cadastrar novo usuário da biblioteca
+def novo_cadastro():
+    pessoa = input('Digite o seu nome: \f')
+    idade = int(input('Digite a sua idade: \f'))
+    cpf = float(input('Digite o seu cpf: \f'))
+    celular = float(input('Digite o seu número de celular: \f'))
+    print(f'Confira as informações: \f Nome: {pessoa} \f Idade: {idade} \f CPF: {cpf} \f Celular: {celular} \f')
+    print(f'Você foi cadastrado(a) com sucesso! \f')
 
 # Menu para o usuário escolher entre cadastrar ou listar livros ou sair
 def main():
  while True:
     print('\nMenu')
-    print('1. Cadastrar livros')
-    print('2. Listar livros')
-    print('3. Sair')
+    print('\f 1. Cadastrar livros \f 2. Listar livros \f 3. Cadastro de pessoa \f 4. Sair \f')
 
     opcao = input('Escolha uma opção: ')
 
@@ -33,6 +40,8 @@ def main():
     elif opcao == '2':
         listar_livros()
     elif opcao == '3':
+        novo_cadastro()
+    elif opcao == '4':
         print('Saindo...')
         break
     else:
