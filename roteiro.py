@@ -7,3 +7,6 @@
 # Novos objetivos:
 # Fazer os livros serem removidos da lista depois de alugados
 # Fazer os livros serem devolvidos para a lista quando devolvidos
+# Atualizações (22/09/2024):
+# Colocar senha para permitir acesso apenas da bibliotecária
+# Permitir que a bibliotecária possa cadastrar livros no sistema
