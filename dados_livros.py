@@ -1,56 +1,77 @@
 import json
 
-# Colocar todos os livros e usuários presentes na biblioteca:
+# Inicialização das listas
 livros = []
 usuarios = []
+livros_alugados = []
 
-# Função para carregar livros de um arquivo
+# Funções para carregar e salvar livros
 def carregar_livros():
     global livros
     try:
         with open('livros.json', 'r') as f:
             livros = json.load(f)
-    except FileNotFoundError:
+    except (FileNotFoundError, json.JSONDecodeError):
         livros = []
 
-# Função para salvar livros em um arquivo
 def salvar_livros():
     with open('livros.json', 'w') as f:
         json.dump(livros, f)
 
-# Função para carregar usuários de um arquivo
+# Funções para carregar e salvar usuários
 def carregar_usuarios():
     global usuarios
     try:
         with open('usuarios.json', 'r') as f:
             usuarios = json.load(f)
-    except FileNotFoundError:
+    except (FileNotFoundError, json.JSONDecodeError):
         usuarios = []
 
-# Função para salvar usuários em um arquivo
 def salvar_usuarios():
     with open('usuarios.json', 'w') as f:
         json.dump(usuarios, f)
 
-# Função para cadastro de livros:
+# Funções para carregar e salvar livros alugados
+def carregar_livros_alugados():
+    global livros_alugados
+    try:
+        with open('livros_alugados.json', 'r') as f:
+            livros_alugados = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        livros_alugados = []
+
+def salvar_livros_alugados():
+    with open('livros_alugados.json', 'w') as f:
+        json.dump(livros_alugados, f)
+
+# Função para cadastrar livros
 def cadastrar_livro():
-    titulo = input("Digite o título do livro: \f")
-    autor = input('Digite o nome do autor do livro: \f')
+    titulo = input("Digite o título do livro: ")
+    autor = input('Digite o nome do autor do livro: ')
     livro = {'Título': titulo, 'Autor': autor}
     livros.append(livro)
     salvar_livros()
-    print('Livro cadastrado com sucesso! \f')
+    print('Livro cadastrado com sucesso!')
 
-# Função para listar os livros cadastrados
+# Função para listar livros
 def listar_livros():
     if not livros:
-        print('Nenhum livro cadastrado. \f')
+        print('Nenhum livro cadastrado.')
     else:
-        print('Lista de livros: \f')
+        print('Lista de livros:')
         for i, livro in enumerate(livros):
-            print(f'{i + 1}. {livro["Título"]} por {livro["Autor"]} \f')
+            print(f'{i + 1}. {livro["Título"]} por {livro["Autor"]}')
 
-# Remover livros do cadastro
+# Função para listar livros alugados
+def listar_livros_alugados():
+    if not livros_alugados:
+        print('Não há livros alugados.')
+    else:
+        print('Lista de livros alugados:')
+        for i, livro in enumerate(livros_alugados):
+            print(f'{i + 1}. {livro["Título"]} por {livro["Autor"]}')
+
+# Remover livro do cadastro
 def remover_livro():
     listar_livros()
     if livros:
@@ -59,40 +80,94 @@ def remover_livro():
             if 0 <= indice < len(livros):
                 livro_removido = livros.pop(indice)
                 salvar_livros()
-                print(f'Livro "{livro_removido["Título"]}" removido com sucesso! \f')
+                print(f'Livro "{livro_removido["Título"]}" removido com sucesso!')
             else:
-                print('Número inválido. \f')
+                print('Número inválido.')
         except ValueError:
-            print('Entrada inválida. Por favor, digite um número. \f')
+            print('Entrada inválida. Por favor, digite um número.')
 
-# Função para cadastrar novo usuário da biblioteca
+# Verificar se o usuário está cadastrado
+def usuario_cadastrado(nome):
+    for usuario in usuarios:
+        if usuario["Nome"].lower() == nome.lower():
+            return True
+    return False
+
+# Alugar livro
+def alugar_livro():
+    nome_usuario = input("Digite o seu nome: ")
+    if not usuario_cadastrado(nome_usuario):
+        print('Usuário não cadastrado. Por favor, cadastre-se antes de alugar um livro.')
+        return
+
+    listar_livros()
+    if livros:
+        try:
+            indice = int(input("Digite o número do livro que deseja alugar: ")) - 1
+            if 0 <= indice < len(livros):
+                livro_alugado = livros.pop(indice)
+                livros_alugados.append(livro_alugado)
+                salvar_livros()
+                salvar_livros_alugados()  # Salvar livros alugados
+                print(f'Livro "{livro_alugado["Título"]}" alugado com sucesso!')
+            else:
+                print('Número inválido.')
+        except ValueError:
+            print('Entrada inválida. Por favor, digite um número.')
+
+# Devolver livro
+def devolver_livro():
+    listar_livros_alugados()
+    if livros_alugados:
+        try:
+            indice = int(input("Digite o número do livro que deseja devolver: ")) - 1
+            if 0 <= indice < len(livros_alugados):
+                livro_devolvido = livros_alugados.pop(indice)
+                livros.append(livro_devolvido)
+                salvar_livros()
+                salvar_livros_alugados()  # Salvar livros alugados
+                print(f'Livro "{livro_devolvido["Título"]}" devolvido com sucesso!')
+            else:
+                print('Número inválido.')
+        except ValueError:
+            print('Entrada inválida. Por favor, digite um número.')
+
+# Cadastrar novo usuário
 def novo_cadastro():
-    pessoa = input('Digite o nome: \f')
+    pessoa = input('Digite o nome: ')
     while True:
         try:
-            idade = int(input('Digite a idade: \f'))
+            idade = int(input('Digite a idade: '))
             if idade <= 0:
                 raise ValueError
             break
         except ValueError:
-            print('Idade inválida. Por favor, digite um número positivo. \f')
-    cpf = (input('Digite o cpf: \f'))
-    celular = (input('Digite o número de celular: \f'))
-    print(f'Confira as informações: \f Nome: {pessoa} \f Idade: {idade} \f CPF: {cpf} \f Celular: {celular} \f')
-    usuarios.append(usuario)
-    salvar_usuarios()
-    print(f'Leitor cadastrado(a) com sucesso! \f')
+            print('Idade inválida. Por favor, digite um número positivo.')
 
-# Função para listar os usuários cadastrados
+    cpf = input('Digite o CPF (somente números): ')
+    celular = input('Digite o número de celular (somente números): ')
+
+    usuario = {
+        "Nome": pessoa,
+        "Idade": idade,
+        "CPF": cpf,
+        "Celular": celular
+    }
+
+    usuarios.append(usuario)
+    salvar_usuarios()  # Salvar usuários
+    print(f'Leitor cadastrado(a) com sucesso!')
+
+# Listar usuários
 def listar_usuarios():
     if not usuarios:
-        print('Nenhum usuário cadastrado. \f')
+        print('Nenhum usuário cadastrado.')
     else:
-        print('Lista de usuários: \f')
+        print('Lista de usuários:')
         for i, usuario in enumerate(usuarios):
-            print(f'{i + 1}. {usuario["Nome"]}, Idade: {usuario["Idade"]}, CPF: {usuario["CPF"]}, Celular: {usuario["Celular"]} \f')
+            print(f'{i + 1}. {usuario["Nome"]}, Idade: {usuario["Idade"]}, CPF: {usuario["CPF"]}, Celular: {usuario["Celular"]}')
 
-# Função para remover um usuário da lista
+# Remover usuário
 def remover_usuario():
     listar_usuarios()
     if usuarios:
@@ -100,30 +175,40 @@ def remover_usuario():
             indice = int(input("Digite o número do usuário que deseja remover: ")) - 1
             if 0 <= indice < len(usuarios):
                 usuario_removido = usuarios.pop(indice)
-                salvar_usuarios()
-                print(f'Usuário "{usuario_removido["Nome"]}" removido com sucesso! \f')
+                salvar_usuarios()  # Salvar usuários
+                print(f'Usuário "{usuario_removido["Nome"]}" removido com sucesso!')
             else:
-                print('Número inválido. \f')
+                print('Número inválido.')
         except ValueError:
-            print('Entrada inválida. Por favor, digite um número. \f')
+            print('Entrada inválida. Por favor, digite um número.')
 
-# Menu para o usuário escolher entre cadastrar ou listar livros ou sair
+# Menu principal
 def main():
- carregar_livros()
- carregar_usuarios()
- while True:
-    print('\f Seja bem-vindo(a) de volta \f')
-    senha = 'ecobio123'
-    digitesenha = input('\f Por favor, digite a senha: ')
-    if senha==digitesenha:
-        print('\f Bem-vindo(a) \f')
-        break
-    else:
-        print('\f Senha incorreta, tente novamente \f')
+    carregar_livros()
+    carregar_usuarios()
+    carregar_livros_alugados()
+    
+    while True:
+        print('Bem-vindo(a) de volta')
+        senha = 'ecobio123'
+        digitesenha = input('Por favor, digite a senha: ')
+        if senha == digitesenha:
+            print('Bem-vindo(a)')
+            break
+        else:
+            print('Senha incorreta, tente novamente')
 
- while True:
+    while True:
         print('\nMenu')
-        print('\f 1. Cadastrar livros \f 2. Listar livros \f 3. Remover livro \f 4. Cadastro de pessoa \f 5. Listar pessoas \f 6. Remover pessoa \f 7. Sair \f')
+        print('1. Cadastrar livros')
+        print('2. Listar livros')
+        print('3. Remover livro')
+        print('4. Alugar livro')
+        print('5. Devolver livro')
+        print('6. Cadastro de pessoa')
+        print('7. Listar pessoas')
+        print('8. Remover pessoa')
+        print('9. Sair')
 
         opcao = input('Escolha uma opção: ')
 
@@ -134,16 +219,20 @@ def main():
         elif opcao == '3':
             remover_livro()
         elif opcao == '4':
-            novo_cadastro()
+            alugar_livro()
         elif opcao == '5':
-            listar_usuarios()
+            devolver_livro()
         elif opcao == '6':
-            remover_usuario()
+            novo_cadastro()
         elif opcao == '7':
+            listar_usuarios()
+        elif opcao == '8':
+            remover_usuario()
+        elif opcao == '9':
             print('Saindo...')
             break
         else:
-            print('Opção inválida. Tente novamente')
+            print('Opção inválida. Tente novamente.')
 
 if __name__ == "__main__":
     main()
