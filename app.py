@@ -1,26 +1,28 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
+from flask import Flask, render_template, request, redirect, url_for
+import json
+import dados_livros 
 
 app = Flask(__name__)
-CORS(app)
 
-# Exemplo de dados (poderia ser dados de um banco de dados)
-livros = [
-    {"id": 1, "titulo": "Livro A", "autor": "Autor A"},
-    {"id": 2, "titulo": "Livro B", "autor": "Autor B"}
-]
+# Inicializar dados
+dados_livros.carregar_livros()
+dados_livros.carregar_usuarios()
+dados_livros.carregar_livros_alugados()
 
-# Rota para pegar a lista de livros (GET)
-@app.route('/api/livros', methods=['GET'])
-def get_livros():
-    return jsonify(livros)
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-# Rota para adicionar um novo livro (POST)
-@app.route('/api/livros', methods=['POST'])
-def add_livro():
-    novo_livro = request.json
-    livros.append(novo_livro)
-    return jsonify(novo_livro), 201
+@app.route('/cadastrar_livro', methods=['GET', 'POST'])
+def cadastrar_livro():
+    if request.method == 'POST':
+        dados_livros.cadastrar_livro(request.form['titulo'], request.form['autor'])
+        return redirect(url_for('index'))
+    return render_template('cadastrar.html')
 
-if __name__ == '__main__':
+@app.route('/listar_livros')
+def listar_livros():
+    return render_template('listar.html', livros=dados_livros.livros)
+
+if __name__ == "__main__":
     app.run(debug=True)

@@ -45,9 +45,7 @@ def salvar_livros_alugados():
         json.dump(livros_alugados, f)
 
 # Função para cadastrar livros
-def cadastrar_livro():
-    titulo = input("Digite o título do livro: ")
-    autor = input('Digite o nome do autor do livro: ')
+def cadastrar_livro(titulo, autor):
     livro = {'Título': titulo, 'Autor': autor}
     livros.append(livro)
     salvar_livros()
