@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Biblioteca</h1>
+    
+    <!-- Exibindo mensagens de flash -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <h2>Cadastrar Livro</h2>
+    <form action="/cadastrar_livro" method="POST">
+        <input type="text" name="titulo" placeholder="Título" required>
+        <input type="text" name="autor" placeholder="Autor" required>
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <h2>Livros</h2>
+    <ul>
+        {% for i, livro in enumerate(livros) %}
+            <li>
+                {{ livro['Título'] }} - {{ livro['Autor'] }} - Status: {{ livro['status'] }}
+                {% if livro['status'] == 'disponível' %}
+                    <form action="/alugar_livro/{{ i }}" method="POST" style="display:inline;">
+                        <select name="usuario" required>
+                            <option value="">Selecione um usuário</option>
+                            {% for j, usuario in enumerate(usuarios) %}
+                                <option value="{{ j }}">{{ usuario['Nome'] }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit">Alugar</button>
+                    </form>
+                {% else %}
+                    Alugado por: {{ usuarios[livro['alugado_por']]['Nome'] }}
+                {% endif %}
+                <form action="/remover_livro/{{ i }}" method="POST" style="display:inline;">
+                    <button type="submit">Remover</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Cadastrar Usuário</h2>
+    <form action="/cadastrar_usuario" method="POST">
+        <input type="text" name="nome" placeholder="Nome" required>
+        <input type="number" name="idade" placeholder="Idade" required>
+        <input type="text" name="cpf" placeholder="CPF" required>
+        <input type="text" name="celular" placeholder="Celular" required>
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <h2>Usuários</h2>
+    <ul>
+        {% for i, usuario in enumerate(usuarios) %}
+            <li>
+                {{ usuario['Nome'] }} - {{ usuario['Idade'] }} - {{ usuario['CPF'] }} - {{ usuario['Celular'] }}
+                <form action="/remover_usuario/{{ i }}" method="POST" style="display:inline;">
+                    <button type="submit">Remover</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
