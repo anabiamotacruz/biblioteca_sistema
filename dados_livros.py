@@ -92,43 +92,29 @@ def usuario_cadastrado(nome):
     return False
 
 # Alugar livro
-def alugar_livro():
-    nome_usuario = input("Digite o seu nome: ")
-    if not usuario_cadastrado(nome_usuario):
-        print('Usuário não cadastrado. Por favor, cadastre-se antes de alugar um livro.')
-        return
-
-    listar_livros()
-    if livros:
-        try:
-            indice = int(input("Digite o número do livro que deseja alugar: ")) - 1
-            if 0 <= indice < len(livros):
-                livro_alugado = livros.pop(indice)
-                livros_alugados.append(livro_alugado)
-                salvar_livros()
-                salvar_livros_alugados()  # Salvar livros alugados
-                print(f'Livro "{livro_alugado["Título"]}" alugado com sucesso!')
-            else:
-                print('Número inválido.')
-        except ValueError:
-            print('Entrada inválida. Por favor, digite um número.')
+def alugar_livro(indice, usuario_index):
+    if 0 <= indice < len(livros):
+        livro = livros[indice]
+        if livro.get('status') == 'disponível':
+            livro['status'] = 'alugado'
+            livro['alugado_por'] = usuarios[usuario_index]['Nome']
+            livros_alugados.append(livro)
+            salvar_livros()
+            salvar_livros_alugados()
+            print(f'Livro "{livro["Título"]}" alugado com sucesso!')
+        else:
+            print('Livro já está alugado.')
 
 # Devolver livro
-def devolver_livro():
-    listar_livros_alugados()
-    if livros_alugados:
-        try:
-            indice = int(input("Digite o número do livro que deseja devolver: ")) - 1
-            if 0 <= indice < len(livros_alugados):
-                livro_devolvido = livros_alugados.pop(indice)
-                livros.append(livro_devolvido)
-                salvar_livros()
-                salvar_livros_alugados()  # Salvar livros alugados
-                print(f'Livro "{livro_devolvido["Título"]}" devolvido com sucesso!')
-            else:
-                print('Número inválido.')
-        except ValueError:
-            print('Entrada inválida. Por favor, digite um número.')
+def devolver_livro(indice):
+    if 0 <= indice < len(livros_alugados):
+        livro = livros_alugados.pop(indice)
+        livro['status'] = 'disponível'
+        livro['alugado_por'] = None
+        livros.append(livro)
+        salvar_livros()
+        salvar_livros_alugados()
+        print(f'Livro "{livro["Título"]}" devolvido com sucesso!')
 
 # Cadastrar novo usuário
 def novo_cadastro():

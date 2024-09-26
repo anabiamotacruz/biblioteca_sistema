@@ -8,16 +8,16 @@
 </head>
 <body>
     <h1>Biblioteca</h1>
-    
+
     <!-- Exibindo mensagens de flash -->
     {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     {% endwith %}
 
     <h2>Cadastrar Livro</h2>
@@ -29,23 +29,31 @@
 
     <h2>Livros</h2>
     <ul>
-        {% for i, livro in enumerate(livros) %}
+        {% for livro in livros %}
             <li>
                 {{ livro['Título'] }} - {{ livro['Autor'] }} - Status: {{ livro['status'] }}
-                {% if livro['status'] == 'disponível' %}
-                    <form action="/alugar_livro/{{ i }}" method="POST" style="display:inline;">
+                
+                {% if livro['status'] == 'alugado' and livro['alugado_por'] is not none %}
+                    Alugado por: {{ usuarios[livro['alugado_por']]['Nome'] }}
+                    <form action="/devolver_livro/{{ loop.index0 }}" method="POST" style="display:inline;">
+                        <button type="submit">Devolver</button>
+                    </form>
+                {% else %}
+                    <!-- Se não estiver alugado, exibe o formulário de aluguel -->
+                    <form action="/alugar_livro/{{ loop.index0 }}" method="POST" style="display:inline;">
                         <select name="usuario" required>
                             <option value="">Selecione um usuário</option>
-                            {% for j, usuario in enumerate(usuarios) %}
-                                <option value="{{ j }}">{{ usuario['Nome'] }}</option>
+                            {% for usuario in usuarios %}
+                                <option value="{{ loop.index0 }}">{{ usuario['Nome'] }}</option>
                             {% endfor %}
                         </select>
                         <button type="submit">Alugar</button>
                     </form>
-                {% else %}
-                    Alugado por: {{ usuarios[livro['alugado_por']]['Nome'] }}
                 {% endif %}
-                <form action="/remover_livro/{{ i }}" method="POST" style="display:inline;">
+
+                
+                <!-- Botão para remover o livro -->
+                <form action="/remover_livro/{{ loop.index0 }}" method="POST" style="display:inline;">
                     <button type="submit">Remover</button>
                 </form>
             </li>
@@ -63,10 +71,10 @@
 
     <h2>Usuários</h2>
     <ul>
-        {% for i, usuario in enumerate(usuarios) %}
+        {% for usuario in usuarios %}
             <li>
-                {{ usuario['Nome'] }} - {{ usuario['Idade'] }} - {{ usuario['CPF'] }} - {{ usuario['Celular'] }}
-                <form action="/remover_usuario/{{ i }}" method="POST" style="display:inline;">
+                {{ usuario['Nome'] }} - {{ usuario['Idade'] }} anos - CPF: {{ usuario['CPF'] }} - Celular: {{ usuario['Celular'] }}
+                <form action="/remover_usuario/{{ loop.index0 }}" method="POST" style="display:inline;">
                     <button type="submit">Remover</button>
                 </form>
             </li>
